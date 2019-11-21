@@ -9,6 +9,13 @@ static bool isch(char ch) {
     return false;
 }
 
+static int date(int a, int b, int c)
+{
+    static int t[] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
+    c -= b < 3;
+    return ( c + c/4 - c/100 + c/400 + t[b-1] + a) % 7;
+}
+
 void jmenu_init()
 {
     
@@ -18,11 +25,11 @@ static void jmenu_dump()
 {
     for (int i = 0; i < _header->entry_count; i++) {
         struct entry_t* e = &_entries[i];
-        printf("- entry\n-- %d\n-- %d\n-- %s\n-- %s\n-- %s\n", e->substance_index, e->dose, e->scale, e->day, e->date);
+        // printf("- entry\n-- %d\n-- %d\n-- %s\n-- %s\n-- %s\n", e->substance_index, e->dose, e->scale, e->day, e->date);
     }
     for (int i = 0; i < _header->substance_count; i++) {
         struct substance_t* s = &_substances[i];
-        printf("- substance\n-- %s\n", s->name);
+        // printf("- substance\n-- %s\n", s->name);
     }
 }
 
@@ -101,21 +108,19 @@ void jmenu_draw_dosages(struct Display* display)
 {
     jmenu_update = jmenu_update_dosages;
     
-    jmenu_dump();
-    
-    draw_box_title(display, 1, 1, 43, 45, 0x0c, 0x00, "List");
+    draw_box_title(display, 1, 1, 46, 45, 0x0c, 0x00, "List");
     draw_box_title(display, 2, 2, 11, 43, 0x0c, 0x00, "Substance");
     draw_box_title(display, 14, 2, 7, 43, 0x0c, 0x00, "Dose");
     draw_box_title(display, 22, 2, 7, 43, 0x0c, 0x00, "Scale");
-    draw_box_title(display, 30, 2, 13, 43, 0x0c, 0x00, "Day");
-    draw_box_title(display, 47, 1, 15, 45, 0x0c, 0x00, "Date");
+    draw_box_title(display, 30, 2, 16, 43, 0x0c, 0x00, "Date");
     
     for (int i = 0; i < _header->entry_count; i++) {
         display_print(display, _substances[_entries[i].substance_index].name, 3, 3+i, 0x0a);
         display_print(display, format_text("%u", _entries[i].dose), 15, 3+i, 0x0a);
         display_print(display, _entries[i].scale, 23, 3+i, 0x0a);
-        display_print(display, _entries[i].day, 31, 3+i, 0x0a);
-        display_print(display, _entries[i].date, 48, 2+i, 0x0a);
+        display_print(display, format_text("%d, %u, %u"), 31, 3+i, 0x0a);
+        // display_print(display, _entries[i].day, 31, 3+i, 0x0a);
+        // display_print(display, _entries[i].date, 48, 2+i, 0x0a);
     }
     
 }
@@ -402,4 +407,5 @@ void jmenu_free()
     if (_header) free(_header);
     if (_entries) free(_entries);
     if (_substances) free(_substances);
+    jmenu_update = NULL;
 }

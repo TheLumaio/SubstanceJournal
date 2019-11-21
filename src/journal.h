@@ -22,13 +22,24 @@ struct entry_t {
     uint16_t substance_index;
     uint16_t dose;
     char scale[16];
-    char day[16];
-    char date[16];
+    uint8_t day;
+    uint8_t month;
+    uint16_t year;
 }; // 64
 
 struct substance_t {
     char name[16];
 }; // 16
+
+static const char _days[7][9] = {
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+};
 
 static struct AES_ctx _ctx;
 static struct header_t* _header = NULL;
@@ -37,7 +48,7 @@ static struct substance_t* _substances = NULL;
 
 static char password_hash[20];
 
-static jmenu_ptr jmenu_update;
+static jmenu_ptr jmenu_update = NULL;
 
 void jmenu_init();
 
