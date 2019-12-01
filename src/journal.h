@@ -18,7 +18,7 @@ struct header_t {
 }; // 16
 
 struct entry_t {
-    unsigned char _pad[12];
+    unsigned char _pad[8];
     uint16_t substance_index;
     uint16_t dose;
     char scale[16];
@@ -28,6 +28,8 @@ struct entry_t {
 }; // 64
 
 struct substance_t {
+    unsigned char _pad[14];
+    uint16_t uid;
     char name[16];
 }; // 16
 

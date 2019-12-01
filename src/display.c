@@ -41,7 +41,7 @@ struct Display* display_create(int width, int height)
 
 void display_free(struct Display* display)
 {
-    // free(display->buffer);
+    free(display->buffer);
     // free(display);
 }
 
@@ -57,6 +57,32 @@ void display_print(struct Display* display, const char* msg, int x, int y, uint8
         changes[changes_made++] = (x+i)*display->height+y;
     }
     display->need_update = true;
+}
+
+void display_rich_print(struct Display* display, const char* msg, int x, int y)
+{
+    int len = strlen(msg);
+    char color_buffer[len];
+    int delta = 0;
+    for (int i = 0; i < len; i++)
+    {
+        if (msg[i] == '{') {
+            memset(color_buffer, 0, len);
+            i++;
+            while (msg[i] != '}') {
+                color_buffer[strlen(color_buffer)] = msg[i];
+                i++;
+            }
+        }
+        else if (msg[i] == '\n') {
+            delta = 0;
+            y++;
+        }
+        else {
+            display_putc(display, msg[i], x+delta, y, strtol(color_buffer, NULL, 0));
+            delta++;
+        }
+    }
 }
 
 void display_putc(struct Display* display, uint8_t c, int x, int y, uint8_t flags)

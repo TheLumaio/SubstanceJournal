@@ -54,6 +54,7 @@ void display_unload();
 struct Display* display_create(int width, int height);
 void display_free(struct Display* display);
 void display_print(struct Display* display, const char* msg, int x, int y, uint8_t flags);
+void display_rich_print(struct Display* display, const char* msg, int x, int y);
 void display_putc(struct Display* display, uint8_t c, int x, int y, uint8_t flags);
 void display_force_change(struct Display* display, int index);
 void display_draw(struct Display* display);

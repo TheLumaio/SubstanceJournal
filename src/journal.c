@@ -41,11 +41,11 @@ static void jmenu_encrypt(char* password)
     size_t entries_size = sizeof(struct entry_t) * _header->entry_count;
     size_t substances_size = sizeof(struct substance_t) * _header->substance_count;
     
-    struct header_t* header_enc = malloc(sizeof(struct header_t));
-    struct entry_t* entries_enc = malloc(entries_size);
-    struct substance_t* substances_enc = malloc(substances_size);
+    struct header_t* header_enc = malloc(header_size*2); // hack
+    struct entry_t* entries_enc = malloc(entries_size*2); // hack
+    struct substance_t* substances_enc = malloc(substances_size*2); // hack
     
-    memcpy(header_enc, _header, sizeof(struct header_t));
+    memcpy(header_enc, _header, header_size);
     memcpy(entries_enc, _entries, entries_size);
     memcpy(substances_enc, _substances, substances_size);
     
@@ -67,14 +67,17 @@ static void jmenu_encrypt(char* password)
 
 static void jmenu_decrypt(char* password)
 {
+    printf("%d %d %d\n", sizeof(struct header_t), sizeof(struct entry_t), sizeof(struct substance_t));
+    
     AES_init_ctx_iv(&_ctx, password, "thisisnot16bytes");
+    
     
     // read buffer
     FILE* f = fopen("data.bin", "rb");
     fseek(f, 0, SEEK_END);
     size_t fsize = ftell(f);
     fseek(f, 0, SEEK_SET);
-    void* data = malloc(fsize);
+    uint8_t* data = malloc(fsize*2); // hack
     fread(data, fsize, 1, f);
     
     // decrypt
@@ -101,36 +104,55 @@ static void jmenu_decrypt(char* password)
     
     // clean up
     fclose(f);
+    
     free(data);
+    
 }
 
 void jmenu_draw_dosages(struct Display* display)
 {
     jmenu_update = jmenu_update_dosages;
     
-    draw_box_title(display, 1, 1, 46, 45, 0x0c, 0x00, "List");
-    draw_box_title(display, 2, 2, 11, 43, 0x0c, 0x00, "Substance");
-    draw_box_title(display, 14, 2, 7, 43, 0x0c, 0x00, "Dose");
-    draw_box_title(display, 22, 2, 7, 43, 0x0c, 0x00, "Scale");
-    draw_box_title(display, 30, 2, 16, 43, 0x0c, 0x00, "Date");
+    draw_box_title(display, 1, 1, 40, 43, 0x0c, 0x00, "List");
+    draw_box_title(display, 2, 2, 11, 41, 0x0c, 0x00, "Substance");
+    draw_box_title(display, 14, 2, 7, 41, 0x0c, 0x00, "Dose");
+    draw_box_title(display, 22, 2, 7, 41, 0x0c, 0x00, "Scale");
+    draw_box_title(display, 30, 2, 10, 41, 0x0c, 0x00, "Date");
     
     for (int i = 0; i < _header->entry_count; i++) {
-        display_print(display, _substances[_entries[i].substance_index].name, 3, 3+i, 0x0a);
-        display_print(display, format_text("%u", _entries[i].dose), 15, 3+i, 0x0a);
+        struct entry_t* e = &_entries[i];
+        display_print(display, _substances[e->substance_index].name, 3, 3+i, 0x0a);
+        display_print(display, format_text("%u", e->dose), 15, 3+i, 0x0a);
         display_print(display, _entries[i].scale, 23, 3+i, 0x0a);
-        display_print(display, format_text("%d, %u, %u"), 31, 3+i, 0x0a);
-        // display_print(display, _entries[i].day, 31, 3+i, 0x0a);
-        // display_print(display, _entries[i].date, 48, 2+i, 0x0a);
+        display_print(display, format_text("%u/%u/%u", e->month,e->day,e->year), 31, 3+i, 0x0a);
     }
     
+    display_rich_print(display, "{0x08}S{0x03}:{0x07}Add substance", 43, 3);
+    display_rich_print(display, "{0x08}A{0x03}:{0x07}Add dose", 43, 5);
+    display_rich_print(display, "{0x08}P{0x03}:{0x07}Print substances", 43, 7);
+    display_rich_print(display, "{0x08}L{0x03}:{0x07}Log out", 43, 9);
+    
+    display_rich_print(display, "{0x09}SubstanceJournal {0x07}by {0x08}.xnc {0x03}based on {0x09}dJournal {0x07}by {0x08}boomer678", 1, 46);
 }
 
 void jmenu_update_dosages(struct Display* display)
 {
-    if (IsKeyPressed(KEY_S)) {
-        clear_box(display, 0, 0, display->width, display->height);
+    if (is_key_pressed(KEY_S)) {
+        clear_box(display, 0, 0, display->width-1, display->height-1);
         jmenu_draw_add_substance(display);
         jmenu_update = jmenu_update_add_substance;
+    }
+    if (is_key_pressed(KEY_A)) {
+        clear_box(display, 0, 0, display->width-1, display->height-1);
+        jmenu_draw_add_dosage(display);
+    }
+    if (is_key_pressed(KEY_P)) {
+        for (int i = 0; i < _header->substance_count; i++) {
+            printf("- %16s\n", _substances[i].name);
+        }
+    }
+    if (is_key_pressed(KEY_L)) {
+        // TODO:
     }
 }
 
@@ -155,13 +177,7 @@ void jmenu_draw_login(struct Display* display)
     draw_box_title(display, display->width/2-26/2, 15, 26, 2, 0x0c, 0x00, "Username");
     draw_box_title(display, display->width/2-26/2, 20, 26, 2, 0x0c, 0x00, "Password");
     
-    display_print(display, "SubstanceJournal", 1, 46, 0x09);
-    display_print(display, "by", 18, 46, 0x07);
-    display_print(display, ".xnc", 21, 46, 0x08);
-    display_print(display, "based on", 26, 46, 0x03);
-    display_print(display, "djournal", 35, 46, 0x09);
-    display_print(display, "by", 44, 46, 0x07);
-    display_print(display, "boomer678", 47, 46, 0x08);
+    display_rich_print(display, "{0x09}SubstanceJournal {0x07}by {0x08}.xnc {0x03}based on {0x09}dJournal {0x07}by {0x08}boomer678", 1, 46);
 }
 
 void jmenu_update_login(struct Display* display)
@@ -239,8 +255,8 @@ void jmenu_draw_add_substance(struct Display* display)
 
     draw_box_title(display, display->width/2-26/2, 15, 26, 2, 0x0c, 0x00, "Substance name");
     
-    display_print(display, "Enter", display->width/2-26/2+2, 23, 0x08);
-    display_print(display, "to add substance", display->width/2-26/2+8, 23, 0x07);
+    display_rich_print(display, "{0x08}Enter {0x07}to add substance", display->width/2-26/2+2, 23);
+    display_rich_print(display, "{0x08}Escape {0x07}to cancel", display->width/2-26/2+5, 25);
 }
 
 void jmenu_update_add_substance(struct Display* display)
@@ -259,24 +275,108 @@ void jmenu_update_add_substance(struct Display* display)
     
     if (is_key_pressed(KEY_ENTER)) {
         _substances = realloc(_substances, sizeof(struct substance_t)*(_header->substance_count + 1));
-        strcpy(_substances[_header->substance_count++].name, substance_name);
+        struct substance_t* substance = &_substances[_header->substance_count];
+        strcpy(substance->name, substance_name);
+        substance->uid = _header->substance_count;
+        _header->substance_count++;
+        
         jmenu_encrypt(password_hash);
         memset(substance_name, 0, 16);
-        clear_box(display, 0, 0, display->width, display->height);
+        clear_box(display, 0, 0, display->width-1, display->height-1);
+        
+        jmenu_draw_dosages(display);
+    }
+    if (is_key_pressed(KEY_ESCAPE)) {
+        memset(substance_name, 0, 16);
+        clear_box(display, 0, 0, display->width-1, display->height-1);
         
         jmenu_draw_dosages(display);
     }
     
 }
 
-
 void jmenu_draw_add_dosage(struct Display* display)
 {
+    jmenu_update = jmenu_update_add_dosage;
     
+    const char* title = \
+    " ___              "\
+    "|   \\ ___ ___ ___ "\
+    "| |) / _ (_-</ -_)"\
+    "|___/\\___/__/\\___|";
+    int y = 0;
+    for (int i = 0; i < strlen(title); i++) {
+        display_putc(display, title[i], 23+i%18, 8+y, 0x0c);
+        if ((i+1)%18 == 0) y++;
+    }
+    
+    draw_box_title(display, display->width/2-31, 8, 11, 36, 0x0c, 0x00, "Substance");
+    draw_box_title(display, display->width/2-19, 8, 4, 36, 0x0c, 0x00, "ID");
+    
+    for (int i = 0; i < _header->substance_count; i++) {
+        display_print(display, _substances[i].name, display->width/2-30, 9+i, 0x0a);
+        display_print(display, format_text("%u", _substances[i].uid), display->width/2-18, 9+i, 0x0a);
+    }
+    
+    draw_box_title(display, display->width/2-26/2, 18, 26, 2, 0x0c, 0x00, "Command");
+    
+    display_rich_print(display, "{0x08}Enter {0x07}to add dosage", display->width/2-26/2+4, 23);
+    display_rich_print(display, "{0x08}Escape {0x07}to cancel", display->width/2-26/2+5, 25);
 }
 
 void jmenu_update_add_dosage(struct Display* display)
 {
+    static char command[20];
+    
+    draw_box_title(display, display->width/2-26/2, 18, 26, 2, 0x0c, 0x00, "Command");
+    
+    int k = get_key_pressed();
+    if (is_key_pressed(KEY_BACKSPACE) && strlen(command) > 0) {
+        display_putc(display, 0x00, display->width/2-26/2+1+strlen(command), 19, 0x00);
+        command[strlen(command)-1] = 0;
+    }
+    if (isch(k) && strlen(command) < 20) {
+        display_putc(display, k, display->width/2-26/2+1+strlen(command), 19, 0x07);
+        command[strlen(command)] = k;
+    }
+    display_putc(display, 0xdb, display->width/2-26/2+1+strlen(command), 19, 0x07);
+    
+    if (is_key_pressed(KEY_ENTER)) {
+        _entries = realloc(_entries, sizeof(struct entry_t)*(_header->entry_count+1));
+        struct entry_t* entry = &_entries[_header->entry_count];
+        
+        char* token;
+        char* date;
+        
+        token = strtok(command, " ");
+        entry->substance_index = atoi(token);
+        token = strtok(NULL, " ");
+        entry->dose = atoi(token);
+        token = strtok(NULL, " ");
+        strcpy(entry->scale, token);
+        token = strtok(NULL, " ");
+        
+        date = strtok(token, "/");
+        entry->month = atoi(date);
+        date = strtok(NULL, "/");
+        entry->day = atoi(date);
+        date = strtok(NULL, "/");
+        entry->year = atoi(date);
+        
+        _header->entry_count++;
+        
+        jmenu_encrypt(password_hash);
+        memset(command, 0, 20);
+        clear_box(display, 0, 0, display->width-1, display->height-1);
+        
+        jmenu_draw_dosages(display);
+    }
+    if (is_key_pressed(KEY_ESCAPE)) {
+        memset(command, 0, 20);
+        clear_box(display, 0, 0, display->width-1, display->height-1);
+        
+        jmenu_draw_dosages(display);
+    }
     
 }
 
@@ -302,13 +402,7 @@ void jmenu_draw_offline(struct Display* display)
     
     draw_box_title(display, display->width/2-26/2, 18, 26, 2, 0x0c, 0x00, "Password");
     
-    display_print(display, "SubstanceJournal", 1, 46, 0x09);
-    display_print(display, "by", 18, 46, 0x07);
-    display_print(display, ".xnc", 21, 46, 0x08);
-    display_print(display, "based on", 26, 46, 0x03);
-    display_print(display, "djournal", 35, 46, 0x09);
-    display_print(display, "by", 44, 46, 0x07);
-    display_print(display, "boomer678", 47, 46, 0x08);
+    display_rich_print(display, "{0x09}SubstanceJournal {0x07}by {0x08}.xnc {0x03}based on {0x09}dJournal {0x07}by {0x08}boomer678", 1, 46);
 }
 
 void jmenu_update_offline(struct Display* display)
@@ -382,15 +476,17 @@ void jmenu_update_offline(struct Display* display)
         strcpy(password_hash, password);
         
         jmenu_decrypt(password);
+        clear_box(display, display->width/2-26/2, 18, 26, 2);
+        draw_box_title(display, display->width/2-26/2, 18, 26, 2, 0x0c, 0x00, "Password");
+        memset(password, '\0', 20);
         if (!_entries) {
-            clear_box(display, display->width/2-26/2, 18, 26, 2);
-            draw_box_title(display, display->width/2-26/2, 18, 26, 2, 0x0c, 0x00, "Password");
             display_print(display, "!ERROR!", display->width/2-26/2, 16, 0x08);
-            memset(password, '\0', 20);
             return;
+        } else {
+            display_print(display, "SUCCESS", display->width/2-26/2, 16, 0x0b);
         }
         
-        clear_box(display, 0, 0, display->width, display->height);
+        clear_box(display, 0, 0, display->width-1, display->height-1);
         memset(password, '\0', 20);
         
         jmenu_draw_dosages(display);

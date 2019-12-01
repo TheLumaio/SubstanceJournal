@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     set_exit_key(KEY_F12);
     
     display_load("font.png");
-    struct Display* display = display_create(64, 48);
+    struct Display* display = display_create(get_screen_width()/10, get_screen_height()/10);
     
     jmenu_draw_offline(display);
     
