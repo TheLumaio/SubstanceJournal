@@ -1,6 +1,8 @@
 #ifndef RAYNAMES_H
 #define RAYNAMES_H
 
+#include <raylib.h>
+
 #define init_window InitWindow
 #define window_should_close WindowShouldClose
 #define close_window CloseWindow
@@ -9,7 +11,7 @@
 #define is_window_resized IsWindowResized
 #define is_window_hidden IsWindowHidden
 #define toggle_fullscreen ToggleFullscreen
-#define unhide_window UnhideWindow
+// #define unhide_window UnhideWindow
 #define hide_window HideWindow
 #define set_window_icon SetWindowIcon
 #define set_window_title SetWindowTitle

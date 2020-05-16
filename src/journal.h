@@ -5,10 +5,10 @@
 
 #include <stdio.h>
 #include "aes.h"
-#include "display.h"
-#include "display_tools.h"
+#include "display/display.h"
+#include "display/display_tools.h"
 
-typedef void(*jmenu_ptr)(struct Display*);
+typedef void(*jmenu_ptr)();
 
 struct header_t {
     unsigned char _pad[7];
@@ -25,13 +25,13 @@ struct entry_t {
     uint8_t day;
     uint8_t month;
     uint16_t year;
-}; // 64
+}; // 32
 
 struct substance_t {
     unsigned char _pad[14];
     uint16_t uid;
     char name[16];
-}; // 16
+}; // 32
 
 static const char _days[7][9] = {
     "Sunday",
@@ -57,23 +57,23 @@ void jmenu_init();
 static void jmenu_encrypt(char*);
 static void jmenu_decrypt(char*);
 
-void jmenu_draw_dosages(struct Display* display);
-void jmenu_update_dosages(struct Display* display);
+void jmenu_draw_dosages();
+void jmenu_update_dosages();
 
-void jmenu_draw_login(struct Display* display);
-void jmenu_update_login(struct Display* display);
+void jmenu_draw_login();
+void jmenu_update_login();
 
-void jmenu_draw_register(struct Display* display);
-void jmenu_update_register(struct Display* display);
+void jmenu_draw_register();
+void jmenu_update_register();
 
-void jmenu_draw_add_substance(struct Display* display);
-void jmenu_update_add_substance(struct Display* display);
+void jmenu_draw_add_substance();
+void jmenu_update_add_substance();
 
-void jmenu_draw_add_dosage(struct Display* display);
-void jmenu_update_add_dosage(struct Display* display);
+void jmenu_draw_add_dosage();
+void jmenu_update_add_dosage();
 
-void jmenu_draw_offline(struct Display* display);
-void jmenu_update_offline(struct Display* display);
+void jmenu_draw_offline();
+void jmenu_update_offline();
 
 jmenu_ptr jmenu_get_ptr();
 void jmenu_free();

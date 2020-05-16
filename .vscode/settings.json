@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "dyad.h": "c",
+        "display_tools.h": "c",
+        "server_impl.h": "c",
+        "rnet.h": "c",
+        "output_handler.h": "c",
+        "display.h": "c",
+        "server.h": "c",
+        "client.h": "c",
+        "login_state.h": "c",
+        "play_state.h": "c",
+        "server_state.h": "c",
+        "raylib.h": "c",
+        "raymath.h": "c",
+        "client_impl.h": "c",
+        "enet.h": "c",
+        "test_state.h": "c",
+        "list.h": "c",
+        "raynames.h": "c"
+    }
+}
