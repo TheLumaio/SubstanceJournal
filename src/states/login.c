@@ -11,7 +11,9 @@ static void _password_changed(char* t, int l)
 
 static void _login_click()
 {
-    journal_decrypt(_password);
+    if (journal_decrypt(_password) == JOURNAL_OK) {
+        SM_SET_STATE(entry);
+    }
 }
 
 static void _create_click()
@@ -36,6 +38,10 @@ void login_init()
     memset(_password, 0, 17);
 
     _main = gui_create();
+    
+    gui_add_child(_main, gui_button("Login", display_get_width()/2-26/2+1, 22, 0, 0x0c, _login_click));
+    gui_add_child(_main, gui_button("Create", display_get_width()/2+26/2-6, 22, 0, 0x08, _create_click));
+    gui_add_child(_main, gui_text_input("Password", display_get_width()/2-26/2, 18, 26, 16, true, _password));
 }
 
 void login_enter()
@@ -56,9 +62,6 @@ void login_enter()
     // display_print("to generate offline database", display_get_width()/2-26/2+1, 25, 0x07);
     
     // draw_box_title(display_get_width()/2-26/2, 18, 26, 2, 0x0c, 0x00, "Password");
-    gui_add_child(_main, gui_button("Login", display_get_width()/2-26/2+1, 22, 0, 0x0c, _login_click));
-    gui_add_child(_main, gui_button("Create", display_get_width()/2+26/2-6, 22, 0, 0x08, _create_click));
-    gui_add_child(_main, gui_text_input("Password", display_get_width()/2-26/2, 18, 26, 16, true, _password));
     
     display_rich_print("{0x09}SubstanceJournal {0x07}by {0x08}.xnc {0x03}based on {0x09}dJournal {0x07}by {0x08}boomer678", 1, 46);
 }

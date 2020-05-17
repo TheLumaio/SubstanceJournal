@@ -7,6 +7,7 @@ void dose_init()
 
 void dose_enter()
 {
+    display_clear(0x0000);
     const char* title = \
     " ___              "\
     "|   \\ ___ ___ ___ "\

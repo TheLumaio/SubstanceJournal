@@ -58,8 +58,8 @@ void display_push()
 
 void display_pop()
 {
-    memcpy(_buffer, _stack->data[_stack->entries-1], sizeof(uint16_t)*_length);
-    list_remove(_stack, _stack->entries-1, true);
+    memcpy(_buffer, _stack->data[_stack->count-1], sizeof(uint16_t)*_length);
+    list_remove(_stack, _stack->count-1, true);
     for (int i = 0; i < _length; i++) {
         display_force_change(i);
     }

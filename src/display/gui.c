@@ -22,7 +22,7 @@ void gui_update(gui_layout_t* layout)
     mx = display_get_mouse().x;
     my = display_get_mouse().y;
 
-    for (int i = 0; i < layout->children->entries; i++) {
+    for (int i = 0; i < layout->children->count; i++) {
         gui_child_t* child = layout->children->data[i];
 
         if (is_mouse_button_pressed(MOUSE_LEFT_BUTTON)) {
@@ -42,7 +42,7 @@ void gui_request_focus(gui_child_t* child)
 {
     // if (child->has_focus) return;
     gui_layout_t* layout = child->layout;
-    for (int i = 0; i < layout->children->entries; i++) {
+    for (int i = 0; i < layout->children->count; i++) {
         gui_child_t* nchild = layout->children->data[i];
         if (nchild != child)
             nchild->has_focus = false;
@@ -53,7 +53,7 @@ void gui_request_focus(gui_child_t* child)
 
 void gui_swap_to(gui_layout_t* layout)
 {
-    for (int i = 0; i < layout->children->entries; i++) {
+    for (int i = 0; i < layout->children->count; i++) {
         gui_child_t* nchild = layout->children->data[i];
         nchild->pre_draw = true;
     }

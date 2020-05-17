@@ -8,7 +8,7 @@
 typedef struct list_t {
     void** data;
     int data_length;
-    int entries;
+    int count;
     int max_entries;
     int next_size;
 } list_t;

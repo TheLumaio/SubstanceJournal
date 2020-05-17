@@ -39,6 +39,9 @@ int journal_new(char* password)
 
 int journal_decrypt(char* password)
 {
+    _entries = list_create(8);
+    _substances = list_create(8);
+
     unsigned char keystr[AES_BLOCK_SIZE];
     memcpy(keystr, password, AES_BLOCK_SIZE);
 
@@ -79,7 +82,7 @@ int journal_decrypt(char* password)
 
         list_append(_entries, entry);
     }
-
+    
     for (int i = 0; i < header.substance_count; i++)
     {
         void* enc_substance = malloc(sizeof(substance_t));
@@ -99,4 +102,22 @@ int journal_decrypt(char* password)
 int journal_encrypt(char* password)
 {
     
+}
+
+void journal_add_substance(substance_t* sub)
+{
+    list_append(_substances, sub);
+}
+
+list_t* journal_get_entries() { return _entries; }
+list_t* journal_get_substances() { return _substances; }
+char** journal_get_scales() {
+    if (!_scales) {
+        _scales = list_create(4);
+        list_append(_scales, "UG");
+        list_append(_scales, "MG");
+        list_append(_scales, "G");
+        list_append(_scales, "ML");
+    }
+    return (char**)_scales->data;
 }
