@@ -11,7 +11,8 @@
 #include "display/display.h"
 #include "display/display_tools.h"
 
-#include "journal.h"
+#include "state_manager.h"
+#include "states/state_list.h"
 
 #include "taffer.h"
 
@@ -29,12 +30,13 @@ int main(int argc, char** argv)
     unload_image(i);
     display_set_texture(texture);
     
-    jmenu_draw_offline();
+    sm_init();
+    SM_SET_STATE(login);
     
     while (!window_should_close())
     {
-        jmenu_ptr update = jmenu_get_ptr();
-        update();
+        
+        sm_update();
         
         begin_drawing();
         clear_background(BLACK);
@@ -46,8 +48,6 @@ int main(int argc, char** argv)
         }
     }
     close_window();
-    
-    jmenu_free();
     
     
     return 0;

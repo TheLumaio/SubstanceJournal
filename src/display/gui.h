@@ -36,7 +36,7 @@ gui_child_t* gui_button(char*, int, int, int, int8_t, on_click_ptr);
 static void gui_button_update(gui_child_t*);
 
 typedef void(*on_text_changed_ptr)(char*, int);
-gui_child_t* gui_text_input(char*, int, int, int, int, bool, on_text_changed_ptr);
+gui_child_t* gui_text_input(char*, int, int, int, int, bool, char*);
 static void gui_text_input_update(gui_child_t*);
 
 gui_child_t* gui_drop_menu(char*, char**, int, int, int, int, int*);

@@ -128,10 +128,9 @@ typedef struct text_input_t {
     int offset;
     bool gained_focus;
     bool is_pass;
-    on_text_changed_ptr text_changed;
 } text_input_t;
 
-gui_child_t* gui_text_input(char* title, int x, int y, int width, int max, bool is_pass, on_text_changed_ptr ptr)
+gui_child_t* gui_text_input(char* title, int x, int y, int width, int max, bool is_pass, char* text)
 {
     gui_child_t* child = malloc(sizeof(gui_child_t));
     child->update_ptr = gui_text_input_update;
@@ -143,14 +142,14 @@ gui_child_t* gui_text_input(char* title, int x, int y, int width, int max, bool 
 
     text_input_t* text_input = malloc(sizeof(text_input_t));
     text_input->title = title;
-    text_input->text = malloc(sizeof(char) * max);
+    text_input->text = text;
     text_input->size = 0;
     text_input->max_size = max;
     text_input->cursor_x = 0;
     text_input->offset = 0;
     text_input->gained_focus = false;
     text_input->is_pass = is_pass;
-    text_input->text_changed = ptr;
+    // text_input->text_changed = ptr;
 
     child->data = text_input;
 
@@ -160,6 +159,7 @@ gui_child_t* gui_text_input(char* title, int x, int y, int width, int max, bool 
 void gui_text_input_update(gui_child_t* child)
 {
     text_input_t* text_input = child->data;
+    // text_input->size = strlen(text_input->text);
 
     if (child->pre_draw) {
         draw_box_title(child->x, child->y, child->width, 2, 0x04, 0x00, text_input->title);
@@ -198,7 +198,7 @@ void gui_text_input_update(gui_child_t* child)
                     display_putc(text_input->text[i], child->x+1+i-text_input->offset, child->y+1, c);
             }
 
-            text_input->text_changed(text_input->text, text_input->size);
+            // text_input->text_changed(text_input->text, text_input->size);
         }
     }
 
@@ -228,7 +228,7 @@ void gui_text_input_update(gui_child_t* child)
                 display_putc(text_input->text[i], child->x+1+i-text_input->offset, child->y+1, c);
         }
 
-        text_input->text_changed(text_input->text, text_input->size);
+        // text_input->text_changed(text_input->text, text_input->size);
     }
 
 }
