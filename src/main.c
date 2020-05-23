@@ -6,15 +6,15 @@
 #include <math.h>
 #include <ctype.h>
 
-#include "raynames.h"
+#include "xnc/raynames.h"
 
-#include "display/display.h"
-#include "display/display_tools.h"
+#include "xnc/display/display.h"
+#include "xnc/display/display_tools.h"
 
-#include "state_manager.h"
+#include "xnc/state_manager.h"
 #include "states/state_list.h"
 
-#include "taffer.h"
+#include "xnc/taffer.h"
 
 int main(int argc, char** argv)
 {
@@ -32,6 +32,7 @@ int main(int argc, char** argv)
     
     sm_init();
     SM_SET_STATE(login);
+    
     
     while (!window_should_close())
     {

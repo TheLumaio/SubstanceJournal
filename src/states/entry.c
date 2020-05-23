@@ -2,6 +2,9 @@
 #include "journal.h"
 
 static int _scroll = 0;
+static int _day = 1;
+static int _month = 5;
+static int _year = 2020;
 
 static gui_layout_t* _main;
 
@@ -21,14 +24,15 @@ void entry_init()
 
     _main = gui_create();
 
-    gui_add_child(_main, gui_button("Add substance", 30, 5, 0, -1, _addsub_click));
-    gui_add_child(_main, gui_button("Add entry", 30, 7, 0, -1, _addent_click));
+    gui_add_child(_main, gui_button("Add substance", 30, 40, 0, -1, _addsub_click));
+    gui_add_child(_main, gui_button("Add entry", 30, 41, 0, -1, _addent_click));
+    gui_add_child(_main, gui_calender(34, 4, &_day, &_month, &_year));
 }
 
 void entry_enter()
 {
     display_clear(0x0000);
-    
+
     draw_box(0, 1, display_get_width()-1, display_get_height()-2, 0x0c, 0x00);
     display_print("Substance", 1, 1, 0x0d);
     display_print("Amount", 13, 1, 0x0d);
@@ -48,7 +52,7 @@ void entry_enter()
 
     list_t* entries = journal_get_entries();
     for (int i = _scroll; i < fmin(entries->count, display_get_height()-3); i++) {
-        // TODO:
+        
     }
 
     gui_swap_to(_main);

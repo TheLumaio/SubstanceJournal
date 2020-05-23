@@ -1,10 +1,10 @@
 #ifndef STATE_LIST_H
 #define STATE_LIST_H
 
-#include "state_manager.h"
-#include "display/display.h"
-#include "display/display_tools.h"
-#include "display/gui.h"
+#include "xnc/state_manager.h"
+#include "xnc/display/display.h"
+#include "xnc/display/display_tools.h"
+#include "xnc/display/gui.h"
 
 GAMESTATE_REG(login);
 GAMESTATE_REG(entry);

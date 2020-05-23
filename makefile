@@ -9,10 +9,12 @@ SRCS := $(shell gnufind $(SRC_DIRS) -name *.c)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(shell gnufind $(SRC_DIRS) -type d)
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+XNC_DIR ?= ../ENGINE
 
-LDFLAGS := -std=c99 -static -lraylib -lenet -lopengl32 -lgdi32 -limagehlp -lwinmm -lws2_32 -lssl -lcrypto
+INC_DIRS := $(shell gnufind $(SRC_DIRS) -type d)
+INC_FLAGS := $(addprefix -I,$(INC_DIRS)) -I$(XNC_DIR)/src
+
+LDFLAGS := -std=c99 -static -L$(XNC_DIR)/bin -l:libxnc.a -lraylib -lenet -lopengl32 -lgdi32 -limagehlp -lwinmm -lws2_32 -lssl -lcrypto
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 

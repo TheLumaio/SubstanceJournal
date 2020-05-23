@@ -101,12 +101,17 @@ int journal_decrypt(char* password)
 
 int journal_encrypt(char* password)
 {
-    
+
 }
 
 void journal_add_substance(substance_t* sub)
 {
     list_append(_substances, sub);
+}
+
+void journal_add_entry(entry_t* ent)
+{
+    list_append(_entries, ent);
 }
 
 list_t* journal_get_entries() { return _entries; }

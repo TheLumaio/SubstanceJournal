@@ -1,8 +1,20 @@
 #include "state_list.h"
 
+#include "journal.h"
+
+static gui_layout_t* _main;
+static int _sub_selected = 0;
+
+static list_t* _sub_list;
+
 void dose_init()
 {
     GAMESTATE_INIT(true);
+
+    _sub_list = list_create(8);
+
+    _main = gui_create();
+    gui_add_child(_main, gui_drop_menu("Substance", (char**)_sub_list->data, _sub_list->count, 20, 30, 16, &_sub_selected));
 }
 
 void dose_enter()
@@ -18,24 +30,26 @@ void dose_enter()
         display_putc(title[i], 23+i%18, 8+y, 0x0c);
         if ((i+1)%18 == 0) y++;
     }
+
+    list_empty(_main->children, true);
+
+    list_t* subs = journal_get_substances();
+    list_empty(_sub_list, true);
+    for (int i = 0; i < subs->count; i++) {
+        char* s = malloc(sizeof(char)*17);
+        substance_t* u = subs->data[i];
+        strcpy(s, u->name);
+        list_append(_sub_list, s);
+    }
+
+    gui_add_child(_main, gui_drop_menu("Substance", (char**)_sub_list->data, _sub_list->count, 20, 18, 16, &_sub_selected));
     
-    draw_box_title(display_get_width()/2-31, 8, 11, 36, 0x0c, 0x00, "Substance");
-    draw_box_title(display_get_width()/2-19, 8, 4, 36, 0x0c, 0x00, "ID");
-    
-    // for (int i = 0; i < _header->substance_count; i++) {
-    //     display_print(_substances[i].name, display_get_width()/2-30, 9+i, 0x0a);
-    //     display_print(format_text("%u", _substances[i].uid), display_get_width()/2-18, 9+i, 0x0a);
-    // }
-    
-    draw_box_title(display_get_width()/2-26/2, 18, 26, 2, 0x0c, 0x00, "Command");
-    
-    display_rich_print("{0x08}Enter {0x07}to add dosage", display_get_width()/2-26/2+4, 23);
-    display_rich_print("{0x08}Escape {0x07}to cancel", display_get_width()/2-26/2+5, 25);
+    gui_swap_to(_main);
 }
 
 void dose_update()
 {
-
+    gui_update(_main);
 }
 
 bool dose_is_ready()
