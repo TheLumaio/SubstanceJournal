@@ -3,6 +3,7 @@
 
 static gui_layout_t* _main;
 static char _password[17];
+static gui_child_t* _pass_child;
 
 static void _password_changed(char* t, int l)
 {
@@ -14,6 +15,8 @@ static void _login_click()
     if (journal_decrypt(_password) == JOURNAL_OK) {
         SM_SET_STATE(entry);
     }
+    _pass_child->has_focus = true;
+    _pass_child->pre_draw = true;
 }
 
 static void _create_click()
@@ -23,11 +26,14 @@ static void _create_click()
     printf("%s\n", _password);
     memset(_password, 0, 20);
 
+    _pass_child->has_focus = true;
+    _pass_child->pre_draw = true;
+
     // reset the text input to empty. this is awful.
-    // clear_box(display_get_width()/2-26/2, 18, 26, 2);
-    // list_remove(_main->children, _main->children->entries-1, true);
-    // gui_child_t* c = gui_add_child(_main, gui_text_input("Password", display_get_width()/2-26/2, 18, 26, 16, true, _password));
-    // c->has_focus = true;
+    clear_box(display_get_width()/2-26/2, 18, 26, 2);
+    list_remove(_main->children, _main->children->count-1, true);
+    gui_child_t* c = gui_add_child(_main, gui_text_input("Password", display_get_width()/2-26/2, 18, 26, 16, true, _password));
+    c->has_focus = true;
 
 }
 
@@ -41,7 +47,7 @@ void login_init()
     
     gui_add_child(_main, gui_button("Login", display_get_width()/2-26/2+1, 22, 0, 0x0c, _login_click));
     gui_add_child(_main, gui_button("Create", display_get_width()/2+26/2-6, 22, 0, 0x08, _create_click));
-    gui_add_child(_main, gui_text_input("Password", display_get_width()/2-26/2, 18, 26, 16, true, _password));
+    _pass_child = gui_add_child(_main, gui_text_input("Password", display_get_width()/2-26/2, 18, 26, 16, true, _password));
 }
 
 void login_enter()
@@ -69,6 +75,8 @@ void login_enter()
 void login_update()
 {
     gui_update(_main);
+
+    if (is_key_pressed(KEY_ENTER)) _login_click();
 }
 
 bool login_is_ready()

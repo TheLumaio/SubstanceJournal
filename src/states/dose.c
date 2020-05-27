@@ -1,11 +1,51 @@
 #include "state_list.h"
+#include <string.h>
+#include <time.h>
 
 #include "journal.h"
 
 static gui_layout_t* _main;
 static int _sub_selected = 0;
-
 static list_t* _sub_list;
+
+static char _amount[9];
+static char _comments[33];
+
+static void _done_click()
+{
+    entry_t* entry = malloc(sizeof(entry_t));
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    entry->day = tm.tm_mday;
+    entry->month = tm.tm_mon + 1;
+    entry->year = (1900+tm.tm_year)-2000;
+
+    entry->hour = tm.tm_hour;
+    entry->minute = tm.tm_min;
+
+    entry->amount = atoi(_amount);
+    entry->substance = _sub_selected;
+
+    strcpy(entry->note, _comments);
+
+    journal_add_entry(entry);
+
+    memset(_amount, 0, sizeof(_amount));
+    memset(_comments, 0, sizeof(_comments));
+
+    SM_SET_STATE(entry);
+
+}
+
+static void _cancel_click()
+{
+    memset(_amount, 0, sizeof(_amount));
+    memset(_comments, 0, sizeof(_comments));
+
+    SM_SET_STATE(entry);
+}
 
 void dose_init()
 {
@@ -42,7 +82,12 @@ void dose_enter()
         list_append(_sub_list, s);
     }
 
-    gui_add_child(_main, gui_drop_menu("Substance", (char**)_sub_list->data, _sub_list->count, 20, 18, 16, &_sub_selected));
+    gui_add_child(_main, gui_drop_menu("Substance", (char**)_sub_list->data, _sub_list->count, display_get_width()/2-9, 18, 17, &_sub_selected));
+    gui_add_child(_main, gui_text_input("Amount", display_get_width()/2-9, 22, 17, 8, false, _amount));
+    gui_add_child(_main, gui_text_input("Comments", display_get_width()/2-9, 26, 17, 32, false, _comments));
+    
+    gui_add_child(_main, gui_button("Done", display_get_width()/2-9, 30, 0, 0x0c, _done_click));
+    gui_add_child(_main, gui_button("Cancel", display_get_width()/2+3, 30, 0, 0x08, _cancel_click));
     
     gui_swap_to(_main);
 }

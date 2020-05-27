@@ -29,7 +29,7 @@ void substance_init()
 
     _main = gui_create();
     gui_add_child(_main, gui_text_input("Substance name", display_get_width()/2-26/2, 15, 18, 16, false, _name));
-    gui_add_child(_main, gui_drop_menu("Scale", journal_get_scales(), 4, display_get_width()/2+6, 16, 8, &_scale));
+    gui_add_child(_main, gui_drop_menu("Scale", journal_get_scales(), 4, display_get_width()/2+6, 15, 8, &_scale));
     gui_add_child(_main, gui_button("Create", display_get_width()/2-26/2+1, 18, 0, 0x0c, _create_click));
     gui_add_child(_main, gui_button("Cancel", display_get_width()/2-26/2+12, 18, 0, 0x08, _cancel_click));
 }
@@ -51,12 +51,7 @@ void substance_enter()
         if ((i+1)%39 == 0) y++;
     }
 
-    display_print("Scale", display_get_width()/2+6, 15, 0x07);
-
-    // draw_box_title(display_get_width()/2-26/2, 15, 26, 2, 0x0c, 0x00, "Substance name");
-    
-    // display_rich_print("{0x08}Enter {0x07}to add substance", display_get_width()/2-26/2+2, 23);
-    // display_rich_print("{0x08}Escape {0x07}to cancel", display_get_width()/2-26/2+5, 25);
+    memset(_name, 0, 17);
 
     gui_swap_to(_main);
 }

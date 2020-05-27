@@ -19,6 +19,9 @@ typedef struct entry_t {
     uint8_t day;
     uint8_t month;
     uint8_t year; // 2000+year
+    uint8_t hour;
+    uint8_t minute;
+    char note[33];
     // TODO: Notes
 } entry_t;
 
@@ -37,13 +40,16 @@ enum journal_status {
 static list_t* _scales;
 static list_t* _entries;
 static list_t* _substances;
+static char* _passwd;
 
 int journal_new(char*);
 int journal_decrypt(char*);
-int journal_encrypt(char*);
+int journal_encrypt();
 
 void journal_add_substance(substance_t*);
 void journal_add_entry(entry_t*);
+
+list_t* journal_get_entries_at(int, int, int);
 
 list_t* journal_get_entries();
 list_t* journal_get_substances();
